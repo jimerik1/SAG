@@ -4,6 +4,7 @@
 #include <vector>
 #include "bha_component.h"
 #include "trajectory.h"
+#include "fea_results.h"
 #include "../beam_elements/beam_element.h"
 
 class FEASolver {
@@ -30,6 +31,9 @@ public:
     // Get complete deflection profile
     std::vector<std::pair<double, double>> getDeflectionProfile() const;
     
+    // Get complete results
+    FEAResults getResults() const;
+    
 private:
     // Input data
     std::vector<BHAComponent> components_;
@@ -50,6 +54,13 @@ private:
     int numDofs_;
     std::vector<double> nodePositions_;
     
+    // Results
+    std::vector<std::pair<double, double>> shearForces_;
+    std::vector<std::pair<double, double>> bendingMoments_;
+    std::vector<std::pair<double, double>> slopes_;
+    double bitSideForce_;
+    std::vector<StabilizerForce> stabilizerForces_;
+    
     // Create mesh
     void createMesh();
     
@@ -62,6 +73,12 @@ private:
     // Apply boundary conditions
     void applyBoundaryConditions();
     
+    // Calculate internal forces from displacements
+    void calculateInternalForces();
+    
+    // Calculate side forces at stabilizers and bit
+    void calculateSideForces();
+    
     // Calculate material properties for each element
     MaterialProperties getMaterialProperties(const std::string& grade) const;
     
@@ -71,21 +88,3 @@ private:
     // Calculate cross-sectional area
     double calculateArea(double od, double id) const;
 };
-
-public:
-    // Get complete results
-    FEAResults getResults() const;
-    
-private:
-    // Calculate internal forces from displacements
-    void calculateInternalForces();
-    
-    // Calculate side forces at stabilizers and bit
-    void calculateSideForces();
-    
-    // Member variables to store calculated results
-    std::vector<std::pair<double, double>> shearForces_;
-    std::vector<std::pair<double, double>> bendingMoments_;
-    std::vector<std::pair<double, double>> slopes_;
-    double bitSideForce_;
-    std::vector<StabilizerForce> stabilizerForces_;

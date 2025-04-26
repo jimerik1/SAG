@@ -2,6 +2,7 @@
 #include "fea_solver.h"
 #include <cmath>
 #include <Eigen/SparseLU>
+#include <iostream>
 
 FEASolver::FEASolver(const std::vector<BHAComponent>& components,
                     const std::vector<MaterialProperties>& materials,
@@ -16,7 +17,8 @@ FEASolver::FEASolver(const std::vector<BHAComponent>& components,
       mudWeight_(mudWeight),
       wob_(wob),
       numNodes_(0),
-      numDofs_(0) {}
+      numDofs_(0),
+      bitSideForce_(0.0) {}
 
 void FEASolver::setupSystem() {
     createMesh();
@@ -100,6 +102,88 @@ void FEASolver::assembleStiffnessMatrix() {
     globalStiffnessMatrix_.setFromTriplets(triplets.begin(), triplets.end());
 }
 
+void FEASolver::assembleLoadVector() {
+    // Initialize global load vector
+    globalLoadVector_ = Eigen::VectorXd::Zero(numDofs_);
+    
+    // Get average inclination from the trajectory
+    double avgInclination = 0.0;
+    for (const auto& point : trajectory_.points) {
+        avgInclination += point.inclination;
+    }
+    avgInclination /= trajectory_.points.size();
+    
+    // Average azimuth
+    double avgAzimuth = 0.0;
+    for (const auto& point : trajectory_.points) {
+        avgAzimuth += point.azimuth;
+    }
+    avgAzimuth /= trajectory_.points.size();
+    
+    // Buoyancy factor based on mud weight
+    // Convert mud weight from sg to ppg if needed
+    double mudWeightPpg = mudWeight_ * 8.345;
+    // Calculate buoyancy factor
+    double BF = 65.5 / (65.5 - mudWeightPpg);
+    
+    // Apply gravity loads for each element
+    for (int i = 0; i < elements_.size(); ++i) {
+        // Get element load vector due to gravity
+        Eigen::VectorXd elementLoad = elements_[i].calculateGravityLoad(avgInclination, avgAzimuth);
+        
+        // Apply buoyancy factor to reduce effective weight
+        elementLoad *= BF;
+        
+        // Add to global load vector
+        int startNode = i;
+        int endNode = i + 1;
+        int startDof = startNode * 2;
+        int endDof = endNode * 2;
+        
+        globalLoadVector_(startDof) += elementLoad(0);
+        globalLoadVector_(startDof + 1) += elementLoad(1);
+        globalLoadVector_(endDof) += elementLoad(2);
+        globalLoadVector_(endDof + 1) += elementLoad(3);
+    }
+    
+    // Apply WOB to the bit node (first node)
+    // WOB acts along the wellbore axis, so it doesn't directly contribute to lateral loading
+    // It affects the axial compression in the BHA, which is already accounted for in the beam-column model
+}
+
+void FEASolver::applyBoundaryConditions() {
+    // Apply bit boundary condition (pinned - zero displacement)
+    int bitDofIndex = 0;  // First node, displacement DOF
+    
+    // Modify stiffness matrix to enforce zero displacement at bit
+    globalStiffnessMatrix_.coeffRef(bitDofIndex, bitDofIndex) = 1.0e12;  // Large value to approximate fixed constraint
+    globalLoadVector_(bitDofIndex) = 0.0;
+    
+    // Apply stabilizer boundary conditions
+    for (const auto& component : components_) {
+        if (component.isStabilizer) {
+            // Find the node closest to the stabilizer position
+            double stabilizerPos = component.distanceFromBit;
+            int nodeIndex = static_cast<int>(round(stabilizerPos / elementSize_));
+            
+            if (nodeIndex < numNodes_) {
+                int dofIndex = nodeIndex * 2;  // Displacement DOF
+                
+                // Enforce zero displacement at stabilizer
+                globalStiffnessMatrix_.coeffRef(dofIndex, dofIndex) = 1.0e12;  // Large value to approximate fixed constraint
+                globalLoadVector_(dofIndex) = 0.0;
+                
+                std::cout << "Applied stabilizer constraint at position " << stabilizerPos 
+                          << " m (component: " << component.name << ")" << std::endl;
+            }
+        }
+    }
+    
+    // Apply wellbore curvature effects (optional, for advanced models)
+    // This would adjust the load vector based on the curvature of the wellbore
+    // Simplified version: assuming straight wellbore sections between survey points
+}
+
 void FEASolver::solve() {
     // Solve the system Kd = F
     Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
@@ -114,6 +198,10 @@ void FEASolver::solve() {
     if (solver.info() != Eigen::Success) {
         throw std::runtime_error("Solving failed");
     }
+    
+    // Calculate internal forces and side forces after solving
+    calculateInternalForces();
+    calculateSideForces();
 }
 
 double FEASolver::getSagCorrection(double distanceFromBit) const {
@@ -138,6 +226,40 @@ double FEASolver::getSagCorrection(double distanceFromBit) const {
     
     // Convert slope to degrees
     return slope * 180.0 / M_PI;
+}
+
+double FEASolver::getDeflection(double distanceFromBit) const {
+    // Find the element that contains this position
+    int nodeIndex = static_cast<int>(distanceFromBit / elementSize_);
+    
+    // Ensure we don't go out of bounds
+    if (nodeIndex >= numNodes_ - 1) {
+        nodeIndex = numNodes_ - 2;
+    }
+    
+    // Get the deflections at both nodes of the element
+    double defl1 = displacements_(nodeIndex * 2);
+    double defl2 = displacements_((nodeIndex + 1) * 2);
+    
+    // Interpolate to get deflection at exact position
+    double elementStart = nodeIndex * elementSize_;
+    double position = (distanceFromBit - elementStart) / elementSize_;
+    
+    // Linear interpolation of deflection
+    return defl1 * (1 - position) + defl2 * position;
+}
+
+std::vector<std::pair<double, double>> FEASolver::getDeflectionProfile() const {
+    std::vector<std::pair<double, double>> profile;
+    
+    // Create pairs of (position, deflection) for each node
+    for (int i = 0; i < numNodes_; ++i) {
+        double pos = i * elementSize_;
+        double defl = displacements_(i * 2);
+        profile.push_back(std::make_pair(pos, defl));
+    }
+    
+    return profile;
 }
 
 double FEASolver::calculateMomentOfInertia(double od, double id) const {
@@ -318,24 +440,4 @@ FEAResults FEASolver::getResults() const {
     results.slopeProfile = slopes_;
     
     return results;
-}
-
-void FEASolver::solve() {
-    // Solve the system Kd = F
-    Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
-    solver.compute(globalStiffnessMatrix_);
-    
-    if (solver.info() != Eigen::Success) {
-        throw std::runtime_error("Factorization failed");
-    }
-    
-    displacements_ = solver.solve(globalLoadVector_);
-    
-    if (solver.info() != Eigen::Success) {
-        throw std::runtime_error("Solving failed");
-    }
-    
-    // Calculate internal forces and side forces after solving
-    calculateInternalForces();
-    calculateSideForces();
 }

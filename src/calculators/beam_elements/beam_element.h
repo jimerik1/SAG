@@ -19,6 +19,13 @@ public:
     // Calculate element load vector due to buoyancy
     Eigen::VectorXd calculateBuoyancyLoad(double mudWeight, double inclination, double azimuth) const;
     
+    // Accessor methods
+    double getE() const { return E_; }
+    double getI() const { return I_; }
+    double getA() const { return A_; }
+    double getRho() const { return rho_; }
+    double getLength() const { return length_; }
+    
 private:
     double length_;     // Element length
     double E_;          // Young's modulus
