@@ -1,0 +1,3 @@
+/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles/bha_sag_calculator.dir
+/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles/edit_cache.dir
+/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles/rebuild_cache.dir

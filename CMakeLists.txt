@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(BHASagCalculator)
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find required packages
@@ -18,7 +18,7 @@ set(SOURCES
     src/calculators/fea_core/fea_solver.cpp
     src/calculators/fea_core/trajectory.cpp
     src/calculators/beam_elements/beam_element.cpp
-    src/calculators/utils/file_readers.cpp
+    src/utils/file_readers.cpp        
     src/calculators/main.cpp
 )
 

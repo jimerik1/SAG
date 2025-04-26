@@ -4,7 +4,7 @@
 #include <filesystem>
 #include "fea_core/fea_solver.h"
 #include "fea_core/fea_results.h"
-#include "utils/file_readers.h"
+#include "../utils/file_readers.h"
 
 // Function to generate simple HTML visualization
 void generateVisualization(const FEAResults& results, const std::string& outputFile) {

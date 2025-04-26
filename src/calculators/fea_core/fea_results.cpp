@@ -58,3 +58,13 @@ void FEAResults::writeProfilesToFiles(const std::string& directory) const {
     }
     slopeFile.close();
 }
+
+set(SOURCES
+    src/calculators/fea_core/fea_solver.cpp
+    src/calculators/fea_core/trajectory.cpp
+    src/calculators/fea_core/fea_results.cpp  # Add this line
+    src/calculators/beam_elements/beam_element.cpp
+    src/utils/file_readers.cpp
+    src/calculators/main.cpp
+)
+

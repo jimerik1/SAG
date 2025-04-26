@@ -2,8 +2,8 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "../fea_core/bha_component.h"
-#include "../fea_core/trajectory.h"
+#include "../calculators/fea_core/bha_component.h"
+#include "../calculators/fea_core/trajectory.h"
 
 class FileReaders {
 public:
