@@ -100,10 +100,24 @@ CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/trajectory.cpp.s: cma
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/trajectory.cpp.s"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/jimstrand/Desktop/prog/sag_correcion_api/src/calculators/fea_core/trajectory.cpp -o CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/trajectory.cpp.s
 
+CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.o: CMakeFiles/bha_sag_calculator.dir/flags.make
+CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.o: /Users/jimstrand/Desktop/prog/sag_correcion_api/src/calculators/fea_core/fea_results.cpp
+CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.o: CMakeFiles/bha_sag_calculator.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.o -MF CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.o.d -o CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.o -c /Users/jimstrand/Desktop/prog/sag_correcion_api/src/calculators/fea_core/fea_results.cpp
+
+CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.i"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/jimstrand/Desktop/prog/sag_correcion_api/src/calculators/fea_core/fea_results.cpp > CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.i
+
+CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.s"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/jimstrand/Desktop/prog/sag_correcion_api/src/calculators/fea_core/fea_results.cpp -o CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.s
+
 CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.o: CMakeFiles/bha_sag_calculator.dir/flags.make
 CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.o: /Users/jimstrand/Desktop/prog/sag_correcion_api/src/calculators/beam_elements/beam_element.cpp
 CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.o: CMakeFiles/bha_sag_calculator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.o -MF CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.o.d -o CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.o -c /Users/jimstrand/Desktop/prog/sag_correcion_api/src/calculators/beam_elements/beam_element.cpp
 
 CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.i: cmake_force
@@ -117,7 +131,7 @@ CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp
 CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.o: CMakeFiles/bha_sag_calculator.dir/flags.make
 CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.o: /Users/jimstrand/Desktop/prog/sag_correcion_api/src/utils/file_readers.cpp
 CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.o: CMakeFiles/bha_sag_calculator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.o -MF CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.o.d -o CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.o -c /Users/jimstrand/Desktop/prog/sag_correcion_api/src/utils/file_readers.cpp
 
 CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.i: cmake_force
@@ -131,7 +145,7 @@ CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.s: cmake_force
 CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.o: CMakeFiles/bha_sag_calculator.dir/flags.make
 CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.o: /Users/jimstrand/Desktop/prog/sag_correcion_api/src/calculators/main.cpp
 CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.o: CMakeFiles/bha_sag_calculator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.o -MF CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.o.d -o CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.o -c /Users/jimstrand/Desktop/prog/sag_correcion_api/src/calculators/main.cpp
 
 CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.i: cmake_force
@@ -146,6 +160,7 @@ CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.s: cmake_force
 bha_sag_calculator_OBJECTS = \
 "CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_solver.cpp.o" \
 "CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/trajectory.cpp.o" \
+"CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.o" \
 "CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.o" \
 "CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.o" \
 "CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.o"
@@ -155,12 +170,13 @@ bha_sag_calculator_EXTERNAL_OBJECTS =
 
 bha_sag_calculator: CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_solver.cpp.o
 bha_sag_calculator: CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/trajectory.cpp.o
+bha_sag_calculator: CMakeFiles/bha_sag_calculator.dir/src/calculators/fea_core/fea_results.cpp.o
 bha_sag_calculator: CMakeFiles/bha_sag_calculator.dir/src/calculators/beam_elements/beam_element.cpp.o
 bha_sag_calculator: CMakeFiles/bha_sag_calculator.dir/src/utils/file_readers.cpp.o
 bha_sag_calculator: CMakeFiles/bha_sag_calculator.dir/src/calculators/main.cpp.o
 bha_sag_calculator: CMakeFiles/bha_sag_calculator.dir/build.make
 bha_sag_calculator: CMakeFiles/bha_sag_calculator.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable bha_sag_calculator"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/jimstrand/Desktop/prog/sag_correcion_api/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable bha_sag_calculator"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/bha_sag_calculator.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

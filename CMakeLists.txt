@@ -17,8 +17,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set(SOURCES
     src/calculators/fea_core/fea_solver.cpp
     src/calculators/fea_core/trajectory.cpp
+    src/calculators/fea_core/fea_results.cpp
     src/calculators/beam_elements/beam_element.cpp
-    src/utils/file_readers.cpp        
+    src/utils/file_readers.cpp
     src/calculators/main.cpp
 )
 
