@@ -1,6 +1,0 @@
-property_name	value	unit
-hole_size	8.5	inch
-mud_weight	12.0	ppg
-contact_stiffness	1.0e6	N/m
-max_iterations	20	
-convergence_tolerance	1.0e-6	m

@@ -111,19 +111,23 @@ void generateVisualization(const FEAResults& results, const std::string& outputF
     htmlFile << "        ];\n";
     
     // Create charts
+    // In the JavaScript section of generateVisualization() 
     htmlFile << "        // Deflection Chart\n";
     htmlFile << "        new Chart(document.getElementById('deflectionChart'), {\n";
     htmlFile << "            type: 'line',\n";
     htmlFile << "            data: prepareData(deflectionData),\n";
     htmlFile << "            options: {\n";
     htmlFile << "                scales: {\n";
-    htmlFile << "                    y: { reverse: true },\n";
+    htmlFile << "                    y: { \n";
+    htmlFile << "                        reverse: true,\n";
+    htmlFile << "                        suggestedMin: -0.1,\n";  // Add reasonable limits
+    htmlFile << "                        suggestedMax: 0.1\n";    // Add reasonable limits
+    htmlFile << "                    },\n";
     htmlFile << "                    x: { title: { display: true, text: 'Distance from Bit (m)' } }\n";
     htmlFile << "                },\n";
     htmlFile << "                plugins: { title: { display: true, text: 'BHA Deflected Shape' } }\n";
     htmlFile << "            }\n";
-    htmlFile << "        });\n";
-    
+    htmlFile << "        });\n";    
     htmlFile << "        // Slope Chart\n";
     htmlFile << "        new Chart(document.getElementById('slopeChart'), {\n";
     htmlFile << "            type: 'line',\n";
@@ -164,10 +168,10 @@ void generateVisualization(const FEAResults& results, const std::string& outputF
 int main() {
     try {
         // Load data from files
-        std::string trajectoryFile = "calculators/data/trajectory.txt";
-        std::string bhaComponentsFile = "calculators/data/bha_components.txt";
-        std::string materialPropertiesFile = "calculators/data/material_properties.txt";
-        std::string wellborePropertiesFile = "calculators/data/wellbore_properties.txt";
+        std::string trajectoryFile = "data/trajectory.txt";  // Changed from calculators/data/
+        std::string bhaComponentsFile = "data/bha_components.txt";  // Changed from calculators/data/
+        std::string materialPropertiesFile = "data/material_properties.txt";  // Changed from calculators/data/
+        std::string wellborePropertiesFile = "data/wellbore_properties.txt";  // Changed from calculators/data/
 
         std::cout << "Loading wellbore properties..." << std::endl;
         WellboreProperties wellboreProps = FileReaders::loadWellborePropertiesFromFile(wellborePropertiesFile);
