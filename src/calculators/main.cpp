@@ -167,6 +167,12 @@ int main() {
         std::string trajectoryFile = "calculators/data/trajectory.txt";
         std::string bhaComponentsFile = "calculators/data/bha_components.txt";
         std::string materialPropertiesFile = "calculators/data/material_properties.txt";
+        std::string wellborePropertiesFile = "calculators/data/wellbore_properties.txt";
+
+        std::cout << "Loading wellbore properties..." << std::endl;
+        WellboreProperties wellboreProps = FileReaders::loadWellborePropertiesFromFile(wellborePropertiesFile);
+        std::cout << "Loaded wellbore properties: " << wellboreProps.holeSize << " inch hole." << std::endl;
+
         
         std::cout << "Loading trajectory data..." << std::endl;
         Trajectory trajectory = FileReaders::loadTrajectoryFromFile(trajectoryFile);
@@ -185,8 +191,9 @@ int main() {
         double mudWeight = 12.0;   // 12 ppg mud weight
         double wob = 20000.0;      // 20k lbs WOB
         
+        
         std::cout << "Creating FEA solver..." << std::endl;
-        FEASolver solver(components, materials, trajectory, elementSize, mudWeight, wob);
+        FEASolver solver(components, materials, trajectory, wellboreProps, elementSize);
         
         // Set up and solve FEA system
         std::cout << "Setting up FEA system..." << std::endl;

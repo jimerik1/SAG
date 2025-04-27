@@ -6,15 +6,15 @@
 #include "trajectory.h"
 #include "fea_results.h"
 #include "../beam_elements/beam_element.h"
+#include "../../utils/file_readers.h" // Add this include to access WellboreProperties
 
 class FEASolver {
 public:
     FEASolver(const std::vector<BHAComponent>& components,
               const std::vector<MaterialProperties>& materials,
               const Trajectory& trajectory,
-              double elementSize = 0.1,  // Default element size 10cm
-              double mudWeight = 1.2,    // Default mud weight 1.2 sg
-              double wob = 0.0);         // Weight on bit in N
+              const WellboreProperties& wellboreProps,
+              double elementSize = 0.1);
     
     // Set up the FEA system
     void setupSystem();
@@ -42,12 +42,18 @@ private:
     double elementSize_;
     double mudWeight_;
     double wob_;
+    WellboreProperties wellboreProps_;
+
     
     // FEA system
     std::vector<BeamElement> elements_;
     Eigen::SparseMatrix<double> globalStiffnessMatrix_;
     Eigen::VectorXd globalLoadVector_;
     Eigen::VectorXd displacements_;
+    
+    void applyWellboreContactConstraints();
+    const BHAComponent* getComponentAtPosition(double position) const;
+
     
     // Mesh information
     int numNodes_;

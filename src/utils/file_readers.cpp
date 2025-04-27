@@ -173,3 +173,50 @@ std::vector<MaterialProperties> FileReaders::loadMaterialPropertiesFromFile(cons
     
     return materials;
 }
+
+WellboreProperties FileReaders::loadWellborePropertiesFromFile(const std::string& filename) {
+    WellboreProperties properties;
+    std::ifstream file(filename);
+    
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open wellbore properties file: " + filename);
+    }
+    
+    // Default values in case some are missing from the file
+    properties.holeSize = 8.5;             // 8.5 inch
+    properties.mudWeight = 12.0;           // 12 ppg
+    properties.contactStiffness = 1.0e6;   // 1 MN/m
+    properties.maxIterations = 20;         // 20 iterations
+    properties.convergenceTolerance = 1.0e-6; // 1 micrometer
+    
+    // Skip header lines (first 2 lines)
+    std::string line;
+    std::getline(file, line); // Column names
+    std::getline(file, line); // Units
+    
+    // Read data
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string propName, value, unit;
+        
+        std::getline(ss, propName, '\t');
+        std::getline(ss, value, '\t');
+        std::getline(ss, unit, '\t');
+        
+        std::replace(value.begin(), value.end(), ',', '.');
+        
+        if (propName == "hole_size") {
+            properties.holeSize = std::stod(value);
+        } else if (propName == "mud_weight") {
+            properties.mudWeight = std::stod(value);
+        } else if (propName == "contact_stiffness") {
+            properties.contactStiffness = std::stod(value);
+        } else if (propName == "max_iterations") {
+            properties.maxIterations = std::stoi(value);
+        } else if (propName == "convergence_tolerance") {
+            properties.convergenceTolerance = std::stod(value);
+        }
+    }
+    
+    return properties;
+}

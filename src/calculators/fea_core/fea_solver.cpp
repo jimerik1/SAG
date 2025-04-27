@@ -7,18 +7,18 @@
 FEASolver::FEASolver(const std::vector<BHAComponent>& components,
                     const std::vector<MaterialProperties>& materials,
                     const Trajectory& trajectory,
-                    double elementSize,
-                    double mudWeight,
-                    double wob)
+                    const WellboreProperties& wellboreProps,
+                    double elementSize)
     : components_(components),
       materials_(materials),
       trajectory_(trajectory),
+      wellboreProps_(wellboreProps),
       elementSize_(elementSize),
-      mudWeight_(mudWeight),
-      wob_(wob),
       numNodes_(0),
       numDofs_(0),
       bitSideForce_(0.0) {}
+
+
 
 void FEASolver::setupSystem() {
     createMesh();
