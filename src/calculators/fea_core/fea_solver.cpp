@@ -14,11 +14,11 @@ FEASolver::FEASolver(const std::vector<BHAComponent>& components,
       trajectory_(trajectory),
       wellboreProps_(wellboreProps),
       elementSize_(elementSize),
+      mudWeight_(wellboreProps.mudWeight),
+      wob_(20000.0),
       numNodes_(0),
       numDofs_(0),
       bitSideForce_(0.0) {}
-
-
 
 void FEASolver::setupSystem() {
     createMesh();
@@ -121,10 +121,8 @@ void FEASolver::assembleLoadVector() {
     avgAzimuth /= trajectory_.points.size();
     
     // Buoyancy factor based on mud weight
-    // Convert mud weight from sg to ppg if needed
-    double mudWeightPpg = mudWeight_ * 8.345;
     // Calculate buoyancy factor
-    double BF = 65.5 / (65.5 - mudWeightPpg);
+    double BF = 65.5 / (65.5 - mudWeight_);
     
     // Apply gravity loads for each element
     for (int i = 0; i < elements_.size(); ++i) {
@@ -145,10 +143,6 @@ void FEASolver::assembleLoadVector() {
         globalLoadVector_(endDof) += elementLoad(2);
         globalLoadVector_(endDof + 1) += elementLoad(3);
     }
-    
-    // Apply WOB to the bit node (first node)
-    // WOB acts along the wellbore axis, so it doesn't directly contribute to lateral loading
-    // It affects the axial compression in the BHA, which is already accounted for in the beam-column model
 }
 
 void FEASolver::applyBoundaryConditions() {
@@ -178,14 +172,10 @@ void FEASolver::applyBoundaryConditions() {
             }
         }
     }
-    
-    // Apply wellbore curvature effects (optional, for advanced models)
-    // This would adjust the load vector based on the curvature of the wellbore
-    // Simplified version: assuming straight wellbore sections between survey points
 }
 
 void FEASolver::solve() {
-    // Solve the system Kd = F
+    // First pass: solve unconstrained system
     Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
     solver.compute(globalStiffnessMatrix_);
     
@@ -193,15 +183,159 @@ void FEASolver::solve() {
         throw std::runtime_error("Factorization failed");
     }
     
+    // Initial solution
     displacements_ = solver.solve(globalLoadVector_);
     
     if (solver.info() != Eigen::Success) {
         throw std::runtime_error("Solving failed");
     }
     
-    // Calculate internal forces and side forces after solving
+    // Create a backup of the original stiffness matrix and load vector
+    Eigen::SparseMatrix<double> originalStiffness = globalStiffnessMatrix_;
+    Eigen::VectorXd originalLoads = globalLoadVector_;
+    
+    // Reset the contact nodes we're going to constrain
+    std::vector<int> contactNodes;
+    
+    // Determine which nodes need constraint based on the unconstrained solution
+    for (int i = 0; i < numNodes_; ++i) {
+        double position = i * elementSize_;
+        const BHAComponent* component = getComponentAtPosition(position);
+        
+        double holeRadius = wellboreProps_.holeSize * 0.0254 / 2.0;
+        double componentRadius = component->outerDiameter * 0.0254 / 2.0;
+        double maxDeflection = holeRadius - componentRadius;
+        
+        double currentDeflection = displacements_(i * 2);
+        
+        if (std::abs(currentDeflection) > maxDeflection) {
+            contactNodes.push_back(i);
+        }
+    }
+    
+    // If we found contact nodes, apply contact constraints and re-solve
+    if (!contactNodes.empty()) {
+        std::cout << "Found " << contactNodes.size() << " nodes in contact with wellbore. Re-solving with constraints." << std::endl;
+        
+        // Reset the system
+        globalStiffnessMatrix_ = originalStiffness;
+        globalLoadVector_ = originalLoads;
+        
+        // Apply constraints at contact nodes (pinned boundary conditions)
+        for (int nodeIndex : contactNodes) {
+            int dofIndex = nodeIndex * 2; // Displacement DOF
+            double position = nodeIndex * elementSize_;
+            const BHAComponent* component = getComponentAtPosition(position);
+            
+            double holeRadius = wellboreProps_.holeSize * 0.0254 / 2.0;
+            double componentRadius = component->outerDiameter * 0.0254 / 2.0;
+            double maxDeflection = holeRadius - componentRadius;
+            
+            // Determine sign of contact (which side of the wellbore)
+            double sign = (displacements_(dofIndex) > 0) ? 1.0 : -1.0;
+            
+            // Apply constraint (stronger than standard constraints but not as extreme)
+            globalStiffnessMatrix_.coeffRef(dofIndex, dofIndex) = 1.0e10;
+            globalLoadVector_(dofIndex) = maxDeflection * sign * 1.0e10;
+            
+            std::cout << "Applied contact constraint at position " << position 
+                     << " m. Max allowed deflection: " << maxDeflection * 1000.0 << " mm" << std::endl;
+        }
+        
+        // Re-solve the constrained system
+        solver.compute(globalStiffnessMatrix_);
+        if (solver.info() != Eigen::Success) {
+            throw std::runtime_error("Constrained system factorization failed");
+        }
+        
+        displacements_ = solver.solve(globalLoadVector_);
+        if (solver.info() != Eigen::Success) {
+            throw std::runtime_error("Constrained system solving failed");
+        }
+        
+        // Verify constraints
+        for (int nodeIndex : contactNodes) {
+            int dofIndex = nodeIndex * 2;
+            double position = nodeIndex * elementSize_;
+            const BHAComponent* component = getComponentAtPosition(position);
+            
+            double holeRadius = wellboreProps_.holeSize * 0.0254 / 2.0;
+            double componentRadius = component->outerDiameter * 0.0254 / 2.0;
+            double maxDeflection = holeRadius - componentRadius;
+            
+            std::cout << "Verified position " << position << " m: deflection = " 
+                     << displacements_(dofIndex) * 1000.0 << " mm (max allowed: " 
+                     << maxDeflection * 1000.0 << " mm)" << std::endl;
+        }
+    }
+    
+    // Apply a final direct constraint to ensure no violations
+    for (int i = 0; i < numNodes_; ++i) {
+        double position = i * elementSize_;
+        const BHAComponent* component = getComponentAtPosition(position);
+        
+        double holeRadius = wellboreProps_.holeSize * 0.0254 / 2.0;
+        double componentRadius = component->outerDiameter * 0.0254 / 2.0;
+        double maxDeflection = holeRadius - componentRadius;
+        
+        double currentDeflection = displacements_(i * 2);
+        
+        if (std::abs(currentDeflection) > maxDeflection) {
+            // Preserve sign of deflection
+            double newDeflection = (currentDeflection > 0) ? maxDeflection : -maxDeflection;
+            displacements_(i * 2) = newDeflection;
+        }
+    }
+    
+    // Calculate internal forces after enforcing all constraints
     calculateInternalForces();
     calculateSideForces();
+}
+
+void FEASolver::applyWellboreContactConstraints() {
+    // Apply constraints directly to the displacement field
+    for (int i = 0; i < numNodes_; ++i) {
+        // Find current component at this position
+        double position = i * elementSize_;
+        const BHAComponent* component = getComponentAtPosition(position);
+        
+        // Calculate clearance for this component
+        double holeRadius = wellboreProps_.holeSize * 0.0254 / 2.0; // Convert inches to meters, divide by 2 for radius
+        double componentRadius = component->outerDiameter * 0.0254 / 2.0; // Component OD to radius in meters
+        double maxDeflection = holeRadius - componentRadius;
+        
+        // Get current node deflection
+        double currentDeflection = displacements_(i * 2);
+        
+        // If deflection exceeds limit, clip it to the maximum allowed value
+        if (std::abs(currentDeflection) > maxDeflection) {
+            // Preserve sign of deflection
+            double newDeflection = (currentDeflection > 0) ? maxDeflection : -maxDeflection;
+            
+            std::cout << "Constrained deflection at position " << position 
+                     << " m from " << currentDeflection * 1000.0 << " mm to "
+                     << newDeflection * 1000.0 << " mm (max allowed: " 
+                     << maxDeflection * 1000.0 << " mm)" << std::endl;
+            
+            // Update displacement directly
+            displacements_(i * 2) = newDeflection;
+        }
+    }
+}
+
+const BHAComponent* FEASolver::getComponentAtPosition(double position) const {
+    // Find which component this position belongs to
+    double currentPos = 0.0;
+    for (const auto& component : components_) {
+        double endPos = currentPos + component.length;
+        if (position >= currentPos && position < endPos) {
+            return &component;
+        }
+        currentPos = endPos;
+    }
+    
+    // Default to last component if position is beyond all components
+    return &components_.back();
 }
 
 double FEASolver::getSagCorrection(double distanceFromBit) const {

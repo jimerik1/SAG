@@ -1,0 +1,4 @@
+grade	youngs_modulus	density	poissons_ratio	yield_strength
+	Pa	kg/m3		Pa
+SAE 4145	2.068e11	7850	0.3	7.584e8
+4145H MOD	2.068e11	7850	0.3	7.584e8
